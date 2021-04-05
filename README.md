@@ -1,1 +1,1 @@
-![model](./banco_jogos.png
+![model](./banco_jogos.png)
