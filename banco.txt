@@ -1,0 +1,30 @@
+-- Tabela com as plataformas dos jogos
+CREATE TABLE plataforma(
+	plataforma_id SERIAL PRIMARY KEY,
+	nome VARCHAR(255) NOT NULL
+);
+
+-- Tabela com as categorias dos jogos
+CREATE TABLE categoria(
+	categoria_id SERIAL PRIMARY KEY,
+	nome VARCHAR(255) NOT NULL
+);
+
+-- Tabela para armazenar as informações de cada jogo
+CREATE TABLE jogo(
+	jogo_id SERIAL PRIMARY KEY,
+	nome VARCHAR(255) NOT NULL,
+	nota DECIMAL(100, 2) NOT NULL,
+	categoria_id INTEGER NOT NULL,
+	plataforma_id INTEGER NOT NULL,
+	FOREIGN KEY (categoria_id) REFERENCES categoria(categoria_id),
+	FOREIGN KEY (plataforma_id) REFERENCES plataforma(plataforma_id)
+);
+
+-- Jogos com as melhores notas (acima de 90.0)
+CREATE TABLE melhores_jogos(
+	registro_id SERIAL PRIMARY KEY,
+	jogo_id INTEGER NOT NULL,
+	nota DECIMAL(100, 2),
+	FOREIGN KEY (jogo_id) REFERENCES jogo (jogo_id)
+);

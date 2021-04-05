@@ -1,0 +1,24 @@
+-- Função que adiciona os jogos na tabela melhores_jogos se eles tiverem uma nota acima de 90.0
+CREATE OR REPLACE FUNCTION adiciona_jogos() RETURNS TRIGGER AS $adiciona_jogos$
+	BEGIN
+		IF NEW.nota > 90.0 THEN
+			INSERT INTO melhores_jogos (jogo_id, nota) VALUES (NEW.jogo_id, NEW.nota);
+			RAISE NOTICE 'Jogo adicionado na lista de melhores. :)';
+		ELSE
+			RAISE NOTICE 'Jogo abaixo do esperado';
+		END IF;
+		
+		-- Óbvio que isso é um Assert sem sentido, uma vez que verifica somente um jogo no meio de bilhões,
+		-- mas foi somente para verificar que quando acontece um erro dentro da PL, é feito o Rollback da transação.
+		ASSERT NEW.nome != 'Anthem', 'Anthem não é jogo de verdade';
+		
+		RETURN NEW;
+	END;
+$adiciona_jogos$ LANGUAGE plpgsql;
+
+-- Trigger que dispara a função adiciona_jogos quando alguém tenta inserir um jogo novo na tabela jogo
+DROP TRIGGER verifica_nota ON jogo;
+CREATE TRIGGER verifica_nota 
+AFTER INSERT ON jogo
+FOR EACH ROW
+EXECUTE PROCEDURE adiciona_jogos();

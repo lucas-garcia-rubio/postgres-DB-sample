@@ -1,0 +1,28 @@
+-- Função que abre um cursor para a consulta de notas de todos os jogos ordenadas de forma descrescente
+CREATE FUNCTION notas_ordenadas_desc() RETURNS refcursor AS $$
+	DECLARE
+		cursor_notas refcursor;
+	BEGIN
+		OPEN cursor_notas FOR SELECT nota FROM jogo ORDER BY nota DESC;
+		
+		RETURN cursor_notas;
+	END;
+$$ LANGUAGE plpgsql;
+
+-- Função que utiliza o cursor da tabela ordenada de notas para buscar a maior e a menor nota
+DROP FUNCTION maior_e_menor_nota;
+CREATE OR REPLACE FUNCTION maior_e_menor_nota () RETURNS TABLE (maior_nota DECIMAL, menor_nota DECIMAL) AS $$
+	DECLARE
+		cursor_notas refcursor;
+		maior_nota DECIMAL;
+		menor_nota DECIMAL;
+	BEGIN
+		SELECT notas_ordenadas_desc() INTO cursor_notas;
+		FETCH FIRST FROM cursor_notas INTO maior_nota;
+		FETCH LAST FROM cursor_notas INTO menor_nota;
+		CLOSE cursor_notas;
+		
+		RETURN QUERY SELECT maior_nota, menor_nota;
+		RAISE NOTICE 'Maior nota: %   Menor nota: %', maior_nota, menor_nota;
+	END;
+$$ LANGUAGE plpgsql;
